@@ -9,3 +9,5 @@
 
 <img src="./pics/redis_vs_traditional_database.png" width="60%" />
 
+# Commands for Adding and Querying Data
+
