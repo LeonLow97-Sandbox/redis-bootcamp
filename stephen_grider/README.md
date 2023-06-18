@@ -11,3 +11,16 @@
 
 # Commands for Adding and Querying Data
 
+- [Documentation for Commands](redis.io/commands)
+
+---
+#### `SET`
+
+- `key`: key we are trying to set
+- `value`: value we want to store
+- `EX | PX | EXAT | PXAT | KEEPTTL`: options for when this value should expire
+- `NX | XX`:
+    - `NX`: Only run the SET if the key does not exist
+    - `XX`: Only run the SET if the key already exists
+- `GET`: return the previous value stored at this key.
+---
