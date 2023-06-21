@@ -26,7 +26,7 @@
     - `XX`: Only run the SET if the key already exists
 - `GET`: return the previous value stored at this key.
 
-## Basic Commands
+## Basic Commands with Strings
 
 |Commands|Description|
 |---|---|
@@ -38,6 +38,14 @@
 |`GETRANGE`|Return a sequence of characters from an existing string. `GETRANGE color 0 3` returns all the characters between the first and the 4th.|
 |`SETRANGE`|Update a portion of an existing string. `SETRANGE color 2 blue` start replacing characters at index 2 with the specified value.|
 
-## Redis encoded data
+## Storing numbers in Redis
 
-- Redis encodes data from traditional database to make the operations of update, fetch and create a lot faster.
+- When we store numbers in Redis, `SET age 20`, Redis stores 20 as a string "20".
+- When we retrieve it in our App Server, have to parse "20" to become an integer 20.
+
+|Commands|Description|
+|---|---|
+|`INCR`|`INCR age` adds 1 to the number stored at key|
+|`DECR`|`DECR age` subtracts 1 from the number stored at key|
+|`INCRBY`|`INCRBY age 10` adds an integer to the number stored at key. can specify how much to increase by.|
+|`DECRBY`|`DECRBY age 12` subtracts an integer from the number stored at key. can specify how much to decrease by.|
