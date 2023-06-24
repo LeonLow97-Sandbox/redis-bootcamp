@@ -49,3 +49,8 @@
 |`DECR`|`DECR age` subtracts 1 from the number stored at key|
 |`INCRBY`|`INCRBY age 10` adds an integer to the number stored at key. can specify how much to increase by.|
 |`DECRBY`|`DECRBY age 12` subtracts an integer from the number stored at key. can specify how much to decrease by.|
+
+## Project 1: E-Commerce App Setup (`rbay`)
+
+- Add redis connection to `.env` file
+- Start up application `npm run dev`
