@@ -73,5 +73,7 @@ export const setCachedPage = (route: string, page: string) => {
 		});
 	}
 };
-
 ```
+
+## Hash Data Structure
+
