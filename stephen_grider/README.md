@@ -77,3 +77,15 @@ export const setCachedPage = (route: string, page: string) => {
 
 ## Hash Data Structure
 
+|Commands|Description|
+|---|---|
+|`HSET`|Create a hash and store nested key-value pairs|
+|`HGET`|Get a single field from a hash|
+|`HGETALL`|Get all key-value pair in hash|
+|`HEXISTS`|Does the key exist in the hash? Returns '1' if it exists, '0' if not|
+|`DEL`|Deletes the hash stored at a key|
+|`HDEL`|Deletes a single key-value pair stored in a hash|
+|`HINCRBY`, `HINCRBYFLOAT`|Adds a value to a number stored in a hash|
+|`HSTRLEN`|Gets the length of a string stored in a hash. Returns 0 if not string is set|
+|`HKEYS`|Get all the keys of a hash|
+|`HVALS`|Get all the values of a hash|
