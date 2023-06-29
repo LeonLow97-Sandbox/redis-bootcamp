@@ -89,3 +89,10 @@ export const setCachedPage = (route: string, page: string) => {
 |`HSTRLEN`|Gets the length of a string stored in a hash. Returns 0 if not string is set|
 |`HKEYS`|Get all the keys of a hash|
 |`HVALS`|Get all the values of a hash|
+
+## Node Redis Issues with `HSET` and `HGETALL`
+
+- `~/redis-bootcamp/stephen_grider/rbay/sandbox/index.ts`
+- Calls `toString()` on the values in hashes when using `HSET`.
+- When calling `HGETALL` with a key that does not exist, redis returns `{}` instead of a falsy value.
+
