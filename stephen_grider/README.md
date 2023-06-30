@@ -50,31 +50,6 @@
 |`INCRBY`|`INCRBY age 10` adds an integer to the number stored at key. can specify how much to increase by.|
 |`DECRBY`|`DECRBY age 12` subtracts an integer from the number stored at key. can specify how much to decrease by.|
 
-## Project 1: E-Commerce App Setup (`rbay`)
-
-- Add redis connection to `.env` file
-- Start up application `npm run dev`
-
-```js
-// ~/rbay/src/services/queries/page-cache.ts
-const cacheRoutes = ['/about', '/privacy', '/auth/signin', 'auth/signup'];
-
-export const getCachedPage = (route: string) => {
-	if (cacheRoutes.includes(route)) {
-		return client.get(pageCacheKey(route));
-	}
-	return null;
-};
-
-export const setCachedPage = (route: string, page: string) => {
-	if (cacheRoutes.includes(route)) {
-		return client.set(pageCacheKey(route), page, {
-			EX: 2 // might still have updates to these static pages
-		});
-	}
-};
-```
-
 ## Hash Data Structure
 
 |Commands|Description|
@@ -95,4 +70,3 @@ export const setCachedPage = (route: string, page: string) => {
 - `~/redis-bootcamp/stephen_grider/rbay/sandbox/index.ts`
 - Calls `toString()` on the values in hashes when using `HSET`.
 - When calling `HGETALL` with a key that does not exist, redis returns `{}` instead of a falsy value.
-
