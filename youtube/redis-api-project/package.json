@@ -1,0 +1,21 @@
+{
+  "name": "youtube",
+  "version": "1.0.0",
+  "description": "- NoSQL database. Data is stored in key-value pairs. - Unlike normal database that stores data in disk, redis works in RAM with in memory. If the system crashes, the data is lost and not persistent. - Redis is used more for caching, data that is consistently being used, faster than the traditional database. - Redis is typically built on top of traditional databases like MongoDB, PostgreSQL, ... - Access Redis to check if data is available, otherwise search database for the data, this improves performance by a lot.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.5.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "nodemon": "^3.0.1",
+    "redis": "^4.6.10"
+  }
+}
