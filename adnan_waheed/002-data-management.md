@@ -154,3 +154,83 @@ OK
 2) "user:102"
 3) "user:100"
 ```
+
+# Saving keys information on server
+
+- `SHUTDOWN SAVE` to save keys to the disk
+- `SHUTDOWN NOSAVE` won't save the keys
+
+```
+127.0.0.1:6379> set 1 hello1
+OK
+127.0.0.1:6379> set 2 hello2
+OK
+
+127.0.0.1:6379> SHUTDOWN SAVE
+not connected> ping
+PONG
+127.0.0.1:6379> GET 1
+"hello1"
+127.0.0.1:6379> GET 2
+"hello2"
+
+127.0.0.1:6379> SET 3 hello3
+OK
+127.0.0.1:6379> SHUTDOWN NOSAVE
+not connected> PING
+PONG
+127.0.0.1:6379> GET 3
+(nil)
+127.0.0.1:6379> GET 2
+"hello2"
+```
+
+## `RENAME` a key
+
+- `RENAME key newkey`, recommended to use `RENAMENX` instead
+
+```
+127.0.0.1:6379> SET name1 Leon
+OK
+127.0.0.1:6379> SET name2 Darrel
+OK
+127.0.0.1:6379> RENAME name1 myname
+OK
+127.0.0.1:6379> RENAME name2 myfriend
+OK
+127.0.0.1:6379> keys *
+1) "myfriend"
+2) "myname"
+```
+
+- If newkey already exists, it is overwritten.
+- When this happens `RENAME` executes an implicit `DEL` operation, so if the deleted key contains a very big value, it may cause high latency even if `RENAME` itself is usually a constant-time operation.
+
+```
+127.0.0.1:6379> RENAME myfriend myname
+OK
+127.0.0.1:6379> KEYS *
+1) "myname"
+```
+
+## `RENAMENX`
+
+- Use this instead of `RENAME`.
+- `RENAMENX` renames key to newkey if newkey does not yet exist.
+- Return value:
+    - 1 if key was renamed to newkey.
+    - 0 if newkey already exists.
+
+```
+127.0.0.1:6379> set k1 v1
+OK
+127.0.0.1:6379> set k2 v2
+OK
+127.0.0.1:6379> renamenx k1 k2
+(integer) 0
+127.0.0.1:6379> renamenx k1 k3
+(integer) 1
+127.0.0.1:6379> keys *
+1) "k2"
+2) "k3"
+```
