@@ -234,3 +234,29 @@ OK
 1) "k2"
 2) "k3"
 ```
+
+## Deleting Keys Asynchronously via `UNLINK`
+
+- `DEL key1 key2` deletes synchronously
+- `UNLINK key1 key2` deletes asynchronously (non-blocking operation)
+
+## Finding data type of key
+
+- `TYPE key` get the type of the key
+
+```
+127.0.0.1:6379> set name "Leon"
+OK
+127.0.0.1:6379> type name
+string
+
+127.0.0.1:6379> lpush k1 "value"
+(integer) 1
+127.0.0.1:6379> type k1
+list
+
+127.0.0.1:6379> sadd k2 "value"
+(integer) 1
+127.0.0.1:6379> type k2
+set
+```
