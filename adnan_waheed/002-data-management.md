@@ -60,3 +60,34 @@ OK
 "value2"
 ```
 
+## Key Naming Conventions
+
+- `Object-id:id`
+- Max allowed key size is 512 MB.
+- Redis keys are binary safe - can use binary sequence as key
+- Empty string is also a valid key (not recommended)
+- For example, a user can have an id, belong to a group, have friends.
+    - user:100:group
+
+```
+127.0.0.1:6379> set user:100 Leon
+OK
+127.0.0.1:6379> set user:101 Amy
+OK
+127.0.0.1:6379> set user:102 Darrel
+OK
+
+127.0.0.1:6379>  set user:100:group "Software Engineer"
+OK
+127.0.0.1:6379> set user:101:group HR
+OK
+127.0.0.1:6379> set user:100:friends Darrel
+OK
+127.0.0.1:6379> keys *
+1) "user:101"
+2) "user:102"
+3) "user:100"
+4) "user:100:group"
+5) "user:100:friends"
+```
+
