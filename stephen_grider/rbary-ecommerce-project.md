@@ -1,4 +1,13 @@
-## Project 1: E-Commerce App Setup (`rbay`)
+# Project 1: E-Commerce App Setup (`rbay`)
+
+## Basic Auction Rules of Project
+
+- Users create 'items' to sell.
+- Items have a starting price and an ending time.
+- Other users can 'bid' on an item. A bid must be higher than all previous bids.
+- At the ending time, the user with highest bid wins the item.
+
+## Setup
 
 - Add redis connection to `.env` file
 - Start up application `npm run dev`
@@ -22,19 +31,6 @@ export const setCachedPage = (route: string, page: string) => {
   }
 };
 ```
-
-## App Overview
-
-- Deep walkthrough of the ecommerce app
-- Do design work on how we are going to store data in Redis.
-- Figure out what data should be stored as hashes.
-
-## Basic Auction Rules
-
-- Users create 'items' to sell.
-- Items have a starting price and an ending time.
-- Other users can 'bid' on an item. A bid must be higher than all previous bids.
-- At the ending time, the user with highest bid wins the item.
 
 ---
 
