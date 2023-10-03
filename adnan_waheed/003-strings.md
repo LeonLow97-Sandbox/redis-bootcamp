@@ -235,3 +235,48 @@ OK
 127.0.0.1:6379> get name2
 "\x00\x00\x00\x00\x00\x00 Jie Wei"
 ```
+
+## Set Key and Expiration using `SETEX` and `PSETEX`
+
+- `SETEX key seconds value` set `key` to hold the string `value` and set `key` to timeout after a given number of seconds.
+- This command is equivalent to `SET key value` + `EXPIRE key seconds`
+- `PSETEX` for setting in milliseconds
+
+```
+127.0.0.1:6379> setex app:config:timeout 100 1
+OK
+127.0.0.1:6379> ttl app:config:timeout
+(integer) 89
+
+127.0.0.1:6379> psetex app:config:timeout_ms 100000 1
+OK
+127.0.0.1:6379> ttl app:config:timeout_ms
+(integer) 94
+```
+
+## Set Key if not exists using `SETNX`
+
+- `SETNX key value` set key to hold string value if key does not exist.
+- `SETNX` is short for "SET if Not Exists".
+- Return Values
+    - `1` if the key was set
+    - `0` if the key was not set
+
+```
+127.0.0.1:6379> set num1 100
+OK
+127.0.0.1:6379> get num1
+"100"
+127.0.0.1:6379> setnx num1 200
+(integer) 0
+127.0.0.1:6379> get num1
+"100"
+
+127.0.0.1:6379> setnx num2 200
+(integer) 1
+
+127.0.0.1:6379> setnx user:101:login_attempt 1
+(integer) 1
+127.0.0.1:6379> get user:101:login_attempt
+"1"
+```
