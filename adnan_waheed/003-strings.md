@@ -280,3 +280,40 @@ OK
 127.0.0.1:6379> get user:101:login_attempt
 "1"
 ```
+
+## String Encoding Types
+
+- Redis decides the encoding automatically based on the string value.
+    - `int` for strings representing 64-bit signed integers
+    - `embstr` for strings whose length is less or equal to 44 bytes; this type of encoding is more efficient in memory usage and performance.
+    - `raw` for strings whose length is greater than 44 bytes.
+
+```
+127.0.0.1:6379> set mykey 123456
+OK
+127.0.0.1:6379> object encoding mykey
+"int"
+
+127.0.0.1:6379> set mykey "test string"
+OK
+127.0.0.1:6379> object encoding mykey
+"embstr"
+
+127.0.0.1:6379> set mykey "This is a long string defined for redis database structure"
+OK
+127.0.0.1:6379> object encoding mykey
+"raw"
+```
+
+## Using Serialized JSON
+
+- In the context of JSON, serialization refers to converting an object or data structure into a string representation.
+- In the example below, the data is being serialized into JSON format before being stored.
+- The value retrieved is a string that represents a JSON object.
+
+```
+127.0.0.1:6379> SET json '{"first_name":"Leon","last_name":"Low"}'
+OK
+127.0.0.1:6379> GET json
+"{\"first_name\":\"Leon\",\"last_name\":\"Low\"}"
+```
