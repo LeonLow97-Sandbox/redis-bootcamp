@@ -199,3 +199,39 @@ OK
 "8"
 ```
 
+## Extract string value via `GETRANGE`
+
+- `GETRANGE key start end` returns the substring of the string value stored at key, determined by offsets `start` and `end` (both are inclusive).
+- Time Complexity is O(N) where N is the length of the returned string. Can be considered O(1) for small strings.
+
+```
+127.0.0.1:6379> set website "jiewei.com"
+OK
+
+127.0.0.1:6379> getrange website 2 4
+"ewe"
+127.0.0.1:6379> getrange website 0 -1
+"jiewei.com"
+127.0.0.1:6379> getrange website 0 0
+"j"
+```
+
+## Replace string value using `SETRANGE`
+
+- `SETRANGE key offset value` overwrites part of the string stored at `key`, starting at the specified offset, for the entire length of value.
+- Time Complexity is O(1).
+- If use `SETRANGE` on a key that does not exist, it creates the key along with paddings of `\x00` depending on what offset you put.
+
+```
+127.0.0.1:6379> set name "Hello World"
+OK
+127.0.0.1:6379> SETRANGE name 6 "Leon"
+(integer) 11
+127.0.0.1:6379> get name
+"Hello Leond"
+
+127.0.0.1:6379> SETRANGE name2 6 " Jie Wei"
+(integer) 14
+127.0.0.1:6379> get name2
+"\x00\x00\x00\x00\x00\x00 Jie Wei"
+```
