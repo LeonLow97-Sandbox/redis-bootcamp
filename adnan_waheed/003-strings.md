@@ -317,3 +317,117 @@ OK
 127.0.0.1:6379> GET json
 "{\"first_name\":\"Leon\",\"last_name\":\"Low\"}"
 ```
+
+## Scanning Keys with `SCAN`
+
+- `SCAN cursor` returns data in a paginated format. use the cursor returned from redis-cli after running the `SCAN` command.
+- Time Complexity is O(1)
+- Use `SCAN` instead of `KEYS *` because it is an expensive operation.
+- `SCAN 0` defaults to return 10 keys, default `COUNT` is 10.
+
+- Inserted 50 dummy keys
+
+---
+#### `SCAN` with `COUNT`
+
+```
+127.0.0.1:6379> scan 0 count 15
+1) "52"
+2)  1) "key:39"
+    2) "key:2"
+    3) "key:28"
+    4) "key:32"
+    5) "key:8"
+    6) "key:34"
+    7) "key:37"
+    8) "key:15"
+    9) "key:6"
+   10) "key:13"
+   11) "key:26"
+   12) "key:22"
+   13) "key:49"
+   14) "key:18"
+   15) "key:33"
+127.0.0.1:6379> scan 52 count 15
+1) "9"
+2)  1) "key:46"
+    2) "key:29"
+    3) "key:19"
+    4) "key:12"
+    5) "key:44"
+    6) "key:14"
+    7) "key:3"
+    8) "key:7"
+    9) "key:20"
+   10) "key:9"
+   11) "key:27"
+   12) "key:25"
+   13) "key:36"
+   14) "key:21"
+   15) "key:17"
+127.0.0.1:6379> scan 9 count 15
+1) "15"
+2)  1) "key:5"
+    2) "key:23"
+    3) "key:42"
+    4) "key:43"
+    5) "key:16"
+    6) "key:30"
+    7) "key:31"
+    8) "key:41"
+    9) "key:1"
+   10) "key:40"
+   11) "key:24"
+   12) "key:45"
+   13) "key:35"
+   14) "key:50"
+   15) "key:11"
+   16) "key:10"
+127.0.0.1:6379> scan 15 count 15
+1) "0"
+2) 1) "key:4"
+   2) "key:47"
+   3) "key:38"
+   4) "key:48"
+```
+----
+#### `SCAN` with `MATCH`
+
+- `MATCH` to input regular expression for keys
+
+```
+127.0.0.1:6379> scan 0 match *key:?
+1) "56"
+2) 1) "key:2"
+   2) "key:8"
+   3) "key:6"
+127.0.0.1:6379> scan 56 match *key:?
+1) "10"
+2) 1) "key:3"
+127.0.0.1:6379> scan 10 match *key:?
+1) "57"
+2) 1) "key:7"
+   2) "key:9"
+   3) "key:5"
+```
+----
+
+#### `SCAN` with `TYPE`
+
+- `TYPE` searches for keys that match the data type.
+
+```
+127.0.0.1:6379> scan 0 match *h* type string count 30
+1) "33"
+2) 1) "hello"
+
+127.0.0.1:6379> sadd hobbies basketball
+(integer) 1
+127.0.0.1:6379> sadd hobbies swimming
+(integer) 1
+127.0.0.1:6379> type hobbies
+set
+127.0.0.1:6379> scan 0 type set count 50
+1) "31"
+2) 1) "hobbies"
+```

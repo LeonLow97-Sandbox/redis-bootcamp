@@ -19,6 +19,10 @@ func main() {
 	fmt.Println("Application Status:", getFromRedis("app:status"))
 
 	fmt.Println("All keys:\n", getAllKeys("app*"))
+
+	// for i := 1; i <= 50; i++ {
+	// 	setToRedis("key:"+strconv.Itoa(i), strconv.Itoa(i))
+	// }
 }
 
 func connectRedis() {
