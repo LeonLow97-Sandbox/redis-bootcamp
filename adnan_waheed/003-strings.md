@@ -136,3 +136,66 @@ OK
 127.0.0.1:6379> get website:stats:daily_visitors_log
 "2023-01-01:5000 2023-01-02:7600"
 ```
+
+## Setting and getting multiple keys via `MSET`, `MGET` and `MSETNX`
+
+- `MSET` sets multiple key-value pairs
+- `MGET` retrieves the values of multiple keys
+- `MSETNX` sets multiple key-value pairs only if none of the specified keys already exists in the database.
+
+```
+127.0.0.1:6379> MSET k1 v1 k2 v2 k3 v3
+OK
+127.0.0.1:6379> keys *
+1) "k1"
+2) "k2"
+3) "k3"
+127.0.0.1:6379> MGET k1 k2 k3
+1) "v1"
+2) "v2"
+3) "v3"
+127.0.0.1:6379> MGET k1 k2 k3 k4
+1) "v1"
+2) "v2"
+3) "v3"
+4) (nil)
+127.0.0.1:6379> MSET k1 v10 k2 v2 k3 v3
+OK
+127.0.0.1:6379> get k1
+"v10"
+127.0.0.1:6379> MSETNX k1 v20 k2 v2 k3 v3
+(integer) 0
+127.0.0.1:6379> get k1
+"v10"
+```
+
+## Using `GETSET` for an atomic reset
+
+- `GETSET key value` sets key to value and returns the old value stored at key. Returns an error when key exists but does not hold a string value.
+
+```
+127.0.0.1:6379> set key1 val1
+OK
+127.0.0.1:6379> getset key1 val1.2
+"val1"
+127.0.0.1:6379> get key1
+"val1.2"
+
+127.0.0.1:6379> getset key2 1
+(nil)
+```
+
+- Design Pattern
+    - `GETSET` can be used together with `INCR` for counting atomic reset.
+
+```
+127.0.0.1:6379> set app:daily_tokens 10
+OK
+127.0.0.1:6379> decr app:daily_tokens
+(integer) 9
+127.0.0.1:6379> decr app:daily_tokens
+(integer) 8
+127.0.0.1:6379> getset app:daily_tokens 10
+"8"
+```
+
