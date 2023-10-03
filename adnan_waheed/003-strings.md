@@ -58,3 +58,81 @@ OK
 127.0.0.1:6379> set app:config:usertimeout 100000
 OK
 ```
+
+## Counting Numbers using `INCR` and `DECR`
+
+- `INCR` increases value by 1
+- `DECR` decreases value by 1
+- `INCRBY` increases value by specified number.
+- `DECRBY` decreases value by specified number.
+
+```
+127.0.0.1:6379> set student:101:score:math 10
+OK
+
+127.0.0.1:6379> incr student:101:score:math
+(integer) 11
+127.0.0.1:6379> decr student:101:score:math
+(integer) 10
+
+127.0.0.1:6379> incrby student:101:score:math 60
+(integer) 70
+127.0.0.1:6379> decrby student:101:score:math 30
+(integer) 40
+```
+
+## Counting floating point numbers
+
+- `INCRBYFLOAT` used to increase or decrease floating point values. Specify value as positive or negative.
+- Cannot use `INCRBY` to increase a value that is a float, same for `DECRBY`
+
+```
+127.0.0.1:6379> get num
+"1.5"
+127.0.0.1:6379> incrby num 1
+(error) ERR value is not an integer or out of range
+
+127.0.0.1:6379> incrbyfloat num 1
+"2.5"
+
+127.0.0.1:6379> decrbyfloat num 1
+(error) ERR unknown command 'decrbyfloat', with args beginning with: 'num' '1'
+
+127.0.0.1:6379> incrbyfloat num -1
+"1.5"
+
+127.0.0.1:6379> set add:fees:creditcard 1.0
+OK
+127.0.0.1:6379> incrbyfloat add:fees:creditcard 0.2
+"1.19999999999999996"
+127.0.0.1:6379> incrbyfloat add:fees:creditcard 2.0
+"3.20000000000000018"
+```
+
+## Using `APPEND` for a time series data
+
+- `APPEND key value` If the key already exists and is a string, this command appends the value at the end of the string.
+- `STRLEN key` to get the length of the value
+
+```
+127.0.0.1:6379> set title "Hello"
+OK
+127.0.0.1:6379> append title " Leon"
+(integer) 10
+127.0.0.1:6379> get title
+"Hello Leon"
+
+127.0.0.1:6379> strlen title
+(integer) 10
+```
+
+- Using `APPEND` for a time series data
+
+```
+127.0.0.1:6379> set website:stats:daily_visitors_log "2023-01-01:5000"
+OK
+127.0.0.1:6379> append website:stats:daily_visitors_log " 2023-01-02:7600"
+(integer) 31
+127.0.0.1:6379> get website:stats:daily_visitors_log
+"2023-01-01:5000 2023-01-02:7600"
+```
