@@ -245,3 +245,66 @@ OK
 1) (integer) 1
 2) (integer) 2
 ```
+
+## Remove element via `LREM`
+
+- `LREM key count element` removes the first count occurrences of elements equal to `element` from the list stored at `key`.
+    - `count > 0`: remove elements equal to `element` moving from head to tail. (left to right)
+    - `count < 0`: remove elements equal to `element` moving from tail to head. (right to left)
+    - `count = 0`: remove elements equal to `element`
+
+```
+127.0.0.1:6379> rpush mylist one one two three one
+(integer) 5
+127.0.0.1:6379> lrem mylist 0 "two"
+(integer) 1
+127.0.0.1:6379> lrange mylist 0 -1
+1) "one"
+2) "one"
+3) "three"
+4) "one"
+
+127.0.0.1:6379> lrem mylist 2 "one"
+(integer) 2
+127.0.0.1:6379> lrange mylist 0 -1
+1) "three"
+2) "one"
+
+127.0.0.1:6379> lrem mylist -1 "one"
+(integer) 1
+127.0.0.1:6379> lrange mylist 0 -1
+1) "three"
+```
+
+## Move elements between lists via `LMOVE`
+
+- `LMOVE source destination LEFT|RIGHT LEFT|RIGHT` atomically returns and removes the first/last element of the list stored at `source` and pushes the element at the first/last element of the list stored at `destination`.
+- If `LEFT RIGHT`, takes the leftmost position from source and add to rightmost position in destination.
+- Use case: to arrange cron jobs
+
+```
+127.0.0.1:6379> rpush jobs:pending job1 job2 job3
+(integer) 3
+127.0.0.1:6379> lmove jobs:pending jobs:completed LEFT RIGHT
+"job1"
+127.0.0.1:6379> lrange jobs:pending 0 -1
+1) "job2"
+2) "job3"
+127.0.0.1:6379> lrange jobs:completed 0 -1
+1) "job1"
+127.0.0.1:6379> lmove jobs:pending jobs:completed LEFT RIGHT
+"job2"
+127.0.0.1:6379> lrange jobs:pending 0 -1
+1) "job3"
+127.0.0.1:6379> lrange jobs:completed 0 -1
+1) "job1"
+2) "job2"
+127.0.0.1:6379> lmove jobs:pending jobs:completed LEFT LEFT
+"job3"
+127.0.0.1:6379> lrange jobs:pending 0 -1
+(empty array)
+127.0.0.1:6379> lrange jobs:completed 0 -1
+1) "job3"
+2) "job1"
+3) "job2"
+```
