@@ -6,6 +6,14 @@
 - No way to manipulate data in Redis as compared to SQL with SELECT, ...
 - We issue commands directly on the target data type in Redis
 
+## Strings - Use Cases
+
+- The Redis string data structure is the most versatile data structures that can be used across multiple use cases.
+    - **For serving static websites pages**: Redis.io site uses strings to serve all static page contents.
+    - **Caching**: To store most common, frequently used data within an application or a website.
+    - **Counters**: e.g., Daily website visitors and more.
+    - **Master Catalog and configuration**. E.g., Can store all the application default or user based configuration settings in respective key strings, e.g., SET app:config:website www.KlickAnalytics.com
+
 ## Redis Strings
 
 - String is the basic but more powerful data structure in Redis
