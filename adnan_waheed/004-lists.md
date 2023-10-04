@@ -112,7 +112,7 @@
 6) "HR"
 7) "Programming"
 ```
-## Remove elemnts via `LOPOP` and `RPOP`
+## Remove elemnts via `LPOP` and `RPOP`
 
 - `LPOP key count` removes and returns the first elements of the list stored at key.
 
@@ -180,3 +180,68 @@ OK
 7) "1"
 ```
 
+## `LSET`
+
+- `LSET key index element` sets the list element at index with element. it's like updating an element in the list
+
+```
+127.0.0.1:6379> rpush num 1 2 3 4 5
+(integer) 5
+127.0.0.1:6379> lrange num 0 -1
+1) "1"
+2) "2"
+3) "3"
+4) "4"
+5) "5"
+127.0.0.1:6379> lset num 2 100
+OK
+127.0.0.1:6379> lrange num 0 -1
+1) "1"
+2) "2"
+3) "100"
+4) "4"
+5) "5"
+```
+
+## Find the length of a list using `LLEN`
+
+- `LLEN key` to get the length of a list
+
+```
+127.0.0.1:6379> rpush app:config:lst_supported_lang "English" Japanese Korean Chinese Spanish
+(integer) 5
+127.0.0.1:6379> LLEN app:config:lst_supported_lang
+(integer) 5
+```
+
+## Find matching elements with `LPOS`
+
+- `LPOS key element` returns the index of matching elements inside a Redis list.
+- Options:
+    - `RANK` specifies the rank to start searching from (default is 0).
+    - `COUNT` limits the number of matching elements to return (`0` returns all indexes of the matched element).
+    - `MAXLEN` sets a maximum distance for a range search, e.g., `MAXLEN 2` means with a maximum distance of 2 elements. it only returns 1 index.
+
+```
+127.0.0.1:6379> rpush mylist d a a b c e a a f g
+(integer) 10
+127.0.0.1:6379> lpos mylist a rank 1
+(integer) 1
+127.0.0.1:6379> lpos mylist a count 0
+1) (integer) 1
+2) (integer) 2
+3) (integer) 6
+4) (integer) 7
+127.0.0.1:6379> lpos mylist a count 2
+1) (integer) 1
+2) (integer) 2
+127.0.0.1:6379> lpos mylist a maxlen 2
+(integer) 1
+127.0.0.1:6379> lpos mylist a maxlen 100
+(integer) 1
+127.0.0.1:6379> lpos mylist a maxlen 5
+(integer) 1
+127.0.0.1:6379> lpos mylist a count 0 maxlen 3
+1) (integer) 1
+2) (integer) 2
+```
