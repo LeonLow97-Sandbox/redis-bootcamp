@@ -13,10 +13,18 @@
 
 ## Redis List - Use Cases
 
+Lists contain strings that are sorted by their insertion order. With Redis Lists, can add items to the head or tail of the lists, which is very useful for queueing jobs. Some of the use cases for the list may be:
+
 - Event Queue
     - Lists are used in many tools like Resque, Celery, Logstash.
 - Most recent data
     - Twitter does this by storing the latest tweets of a user in a list.
+- Social Networking Sites
+    - Social platform like Twitter use Redis Lists to populate their timelines or homepage feeds, and can customize the top of their feeds with trending tweets or stories.
+- RSS Feeds:
+    - Can create news feeds from custom sources where you can pull the latest updates and allow interested followers to subscribe to their favorite RSS feed.
+- Leaderboards: This is more of high use cases where Forums like Reddit and other voting platforms utilize Redis Lists to add articles to the leaderboard and even sort them by most viewed and voted entries.
+
 
 ## `LPUSH`, `RPUSH`, `LRANGE`
 
@@ -280,7 +288,7 @@ OK
 
 - `LMOVE source destination LEFT|RIGHT LEFT|RIGHT` atomically returns and removes the first/last element of the list stored at `source` and pushes the element at the first/last element of the list stored at `destination`.
 - If `LEFT RIGHT`, takes the leftmost position from source and add to rightmost position in destination.
-- Use case: to arrange cron jobs
+- Use case: to arrange cron jobs. Can put this in a loop and once its done, we move it from source to destination.
 
 ```
 127.0.0.1:6379> rpush jobs:pending job1 job2 job3
