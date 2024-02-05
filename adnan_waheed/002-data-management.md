@@ -4,7 +4,7 @@
 
 - A key is a way to store and retrieve values
 - All data in Redis is built on keys.
-- `SET key value` set key with valeu
+- `SET key value` set key with value
 - `GET key` get key
 - `DEL key` delete key
   - `DEL key1 key2 key3 ...` delete multiple keys
@@ -15,7 +15,7 @@
 
 - `SETEX key 100 value` setting key and value for 100 seconds
   - `ttl key` check the time to live for the key, if negative means key expired
-  - `expire time` setting the expiry time of the key
+  - `expire key time` setting the expiry time of the key
 - `SET key value px 1000` expires in 1000 milliseconds
   - `pttl key` check time to live in milliseconds
   - `pexpire key time`
@@ -187,7 +187,9 @@ PONG
 
 ## `RENAME` a key
 
-- `RENAME key newkey`, recommended to use `RENAMENX` instead
+- `RENAME <key> <newkey>`, recommended to use `RENAMENX` instead
+- `RENAME` is used to rename a key, and it replaces the existing key if the new key name already exists.
+- `RENAMENX` renames the key only if the new key name does not already exist. It avoids accidentally overriding an existing key with the new key name.
 
 ```
 127.0.0.1:6379> SET name1 Leon

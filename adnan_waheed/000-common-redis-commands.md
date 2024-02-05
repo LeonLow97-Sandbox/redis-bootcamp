@@ -2,12 +2,10 @@
 
 - Redis is a database.
 - Why use Redis? Redis is **fast**!
-  - All data is stored in memory. (can be challenging is working with a dataset that is larger than the memory provided)
+  - All data is stored in memory. (can be challenging working with a dataset that is larger than the memory provided)
   - Data is organized in simple data structures.
   - Redis has a simple feature set.
 - Trade-off: It is more expensive to store data in memory.
-
-<img src="./pics/redis_vs_traditional_database.png" width="60%" />
 
 # Commands for Adding and Querying Data
 
@@ -26,47 +24,78 @@
   - `XX`: Only run the SET if the key already exists
 - `GET`: return the previous value stored at this key.
 
-## Basic Commands with Strings
+## Strings
 
-| Commands   | Description                                                                                                                             |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `SETEX`    | Same thing as SET with the EX option. `SET color red EX 2` is similar to `SETEX color 2 red`                                            |
-| `SETNX`    | `SETNX` does the same thing as SET with the NX option. `SET color red NX` is similar to `SETNX color red`                               |
-| `MSET`     | Set multiple key-value pairs at the same time. E.g., `MSET color red car toyota`.                                                       |
-| `MGET`     | Get multiple keys at the same time.                                                                                                     |
-| `DEL`      | Deletes a key. Works with any data type, not just strings.                                                                              |
-| `GETRANGE` | Return a sequence of characters from an existing string. `GETRANGE color 0 3` returns all the characters between the first and the 4th. |
-| `SETRANGE` | Update a portion of an existing string. `SETRANGE color 2 blue` start replacing characters at index 2 with the specified value.         |
+- The Redis String type is the simplest type of value you can associate with a Redis key.
+- String is not the best term for this type because it it used to hold numeric types as well.
+- Internally it is held as a byte array.
+- A string is a simpler scalar that can hold a
+  - single value
+  - XML
+  - JSON Document
+- A string value can't be bigger than 512 MB.
 
-## Storing numbers in Redis
+|   Commands    | Description                                   |
+| :-----------: | --------------------------------------------- |
+|     `SET`     | Set value                                     |
+|    `SETNX`    | Set value if key does not exist               |
+|    `MSET`     | Set multiple values                           |
+|   `MSETNX`    | Set multiple values if none of the keys exist |
+|     `GET`     | Get value                                     |
+|    `MGET`     | Get multiple values                           |
+|   `GETSET`    | Sets value and returns old value              |
+|    `SETEX`    | Set with expiry in seconds                    |
+|   `PSETEX`    | Set with expiry in milliseconds               |
+|    `INCR`     | Increment integer                             |
+|   `INCRBY`    | Add to integer                                |
+| `INCRBYFLOAT` | Add to float                                  |
+|    `DECR`     | Decrement integer                             |
+|   `DECRBY`    | Subtract from integer                         |
 
-- When we store numbers in Redis, `SET age 20`, Redis stores 20 as a string "20".
-- When we retrieve it in our App Server, have to parse "20" to become an integer 20.
+## Lists
 
-| Commands | Description                                                                                              |
-| -------- | -------------------------------------------------------------------------------------------------------- |
-| `INCR`   | `INCR age` adds 1 to the number stored at key                                                            |
-| `DECR`   | `DECR age` subtracts 1 from the number stored at key                                                     |
-| `INCRBY` | `INCRBY age 10` adds an integer to the number stored at key. can specify how much to increase by.        |
-| `DECRBY` | `DECRBY age 12` subtracts an integer from the number stored at key. can specify how much to decrease by. |
+- A list is a sequence of **ordered** elements.
+- What's the downside? Accessing an element _by index_ is very fast in lists implemented with an Array (constant time indexed access) and not so fast in lists implemented by linked list (where the operation requires an amount of work proportional to the index of the accessed element).
+- You can think of list as an array.
+- Adding new elements at the end of a list or at the beginning is really fast.
+  - Redis List supports constant time O(1) insertion and deletion of a single element near the head and tail
+- The downside is that indexing into the list can be slow.
+  - Accessing middle elements is very slow if it is a very big list, as it is an O(N) operation. It involves traversing the list from either the head or the tail until reaching the desired index.
+- When indexing is required, Sorted Sets are a better option.
 
-## Hash Data Structure
+| Commands  | Description                                         |
+| :-------: | --------------------------------------------------- |
+|  `LPUSH`  | Add a value at the beginning of the list            |
+|  `RPUSH`  | Add a value at the end of the list                  |
+| `LPUSHX`  | Add a value at the beginning only if the key exists |
+| `RPUSHX`  | Add a value at the end only if the key exists       |
+|  `LLEN`   | Get the number of values in the list                |
+| `LRANGE`  | Get values from the list within a specified range   |
+| `LINDEX`  | Get a value from the list by index                  |
+|  `LSET`   | Set a value in the list by index                    |
+| `LINSERT` | Add a value before or after another in the list     |
+|  `LREM`   | Delete elements with a specific value from the list |
+|  `LTRIM`  | Trim the list by removing elements outside a range  |
+|  `LPOP`   | Delete and get the first element from the list      |
+|  `RPOP`   | Delete and get the last element from the list       |
 
-| Commands                  | Description                                                                  |
-| ------------------------- | ---------------------------------------------------------------------------- |
-| `HSET`                    | Create a hash and store nested key-value pairs                               |
-| `HGET`                    | Get a single field from a hash                                               |
-| `HGETALL`                 | Get all key-value pair in hash                                               |
-| `HEXISTS`                 | Does the key exist in the hash? Returns '1' if it exists, '0' if not         |
-| `DEL`                     | Deletes the hash stored at a key                                             |
-| `HDEL`                    | Deletes a single key-value pair stored in a hash                             |
-| `HINCRBY`, `HINCRBYFLOAT` | Adds a value to a number stored in a hash                                    |
-| `HSTRLEN`                 | Gets the length of a string stored in a hash. Returns 0 if not string is set |
-| `HKEYS`                   | Get all the keys of a hash                                                   |
-| `HVALS`                   | Get all the values of a hash                                                 |
+## Hashes
 
-## Node Redis Issues with `HSET` and `HGETALL`
+- Hashes are useful for representing **objects**.
+- Hashes contain one or more fields
 
-- `~/redis-bootcamp/stephen_grider/rbay/sandbox/index.ts`
-- Calls `toString()` on the values in hashes when using `HSET`.
-- When calling `HGETALL` with a key that does not exist, redis returns `{}` instead of a falsy value.
+|    Commands    | Description                             |
+| :------------: | --------------------------------------- |
+|     `HSET`     | Set field value                         |
+|    `HSETNX`    | Set field value if field does not exist |
+|    `HMSET`     | Set multiple field values               |
+|     `HGET`     | Get field value                         |
+|    `HMGET`     | Get multiple field values               |
+|     `HLEN`     | Get Number of fields                    |
+|    `HKEYS`     | Get all field keys                      |
+|    `HVALS`     | Get all field values                    |
+|   `HGETALL`    | Get all fields and values               |
+|   `HEXISTS`    | Check if field exists                   |
+|     `HDEL`     | Delete field                            |
+|   `HINCRBY`    | Increment field integer value           |
+| `HINCRBYFLOAT` | Increment field float value             |

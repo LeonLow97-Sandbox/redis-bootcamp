@@ -29,7 +29,7 @@
 
 - Plain Strings
     - Serving static contents like static website pages
-    - Redis.io websute uses Redis database itself to serve all static pages
+    - Redis.io website uses Redis database itself to serve all static pages
 - Caching
     - Frequently used data can be cached into string
     - With the help of `EX`, `SET` commands, caching can be possible.

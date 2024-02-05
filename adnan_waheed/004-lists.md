@@ -51,7 +51,7 @@ Lists contain strings that are sorted by their insertion order. With Redis Lists
 4) "Marketing"
 ```
 
-## Using `LINDEX` to view latest stock prices
+## `LINDEX`
 
 - `LINDEX key index` returns the element at the specified index in the list stored at key.
 - Time complexity is O(N) where N is the number of elements to traverse to get to the element at index. This makes asking for the first or the last element of the list O(1).
@@ -162,7 +162,7 @@ Lists contain strings that are sorted by their insertion order. With Redis Lists
 
 ## `LTRIM` 
 
-- `LTRIM key start stop` trim an existing list so that it will contain only the specified range of elements specified.
+- `LTRIM key start stop` trims a list, by removing elements outside the specified range of indices, defined by the start and stop parameters.
 
 ```
 127.0.0.1:6379> lrange num 0 -1
@@ -260,6 +260,7 @@ OK
     - `count > 0`: remove elements equal to `element` moving from head to tail. (left to right)
     - `count < 0`: remove elements equal to `element` moving from tail to head. (right to left)
     - `count = 0`: remove elements equal to `element`
+- E.g., If `count = 5`, it will remove 5 elements from left to right.
 
 ```
 127.0.0.1:6379> rpush mylist one one two three one
