@@ -99,3 +99,40 @@
 |     `HDEL`     | Delete field                            |
 |   `HINCRBY`    | Increment field integer value           |
 | `HINCRBYFLOAT` | Increment field float value             |
+
+## Sets
+
+Redis Sets can be used in a lot of scenarios like:
+
+- Unique user tracking visiting a website
+- Holding unique list of items like user groups, user avatar names, product names, country codes, etc.
+- Sharded data of unique values for an application
+- **IP Tracking**: storing unique IP addresses to track visitors
+- Implementing a product recommendation based on a user action, similar to Amazon feature where they display 'People also buy these items'.
+- Analyzing Ecommerce Sites - Many online e-commerce websites use Redis Sets to analyze customer behavior such as searches, or purchases for a specific product category or subcategory. For example, an online bookstore owner can find out how many customers purchased technology books in Technology section.
+- Inappropriate Content Filtering - For any app that collects user input, it's a good idea to implement some kind of content filtering for any inappropriate words, and we can do this with Redis Sets by adding you would like to filter to a SET key and the SADD command. E.g., `SADD bad_words "word1" "word2"`
+
+---
+
+- Redis Sets are unordered collection of strings.
+- They cannot have duplicate values.
+- Sets are good for expressing relations between objects.
+
+| Commands      | Description                                                                               |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| `SADD`        | Add one or more members to a set                                                          |
+| `SMOVE`       | Move a member from one set to another                                                     |
+| `SREM`        | Remove one or more members from a set                                                     |
+| `SPOP`        | Remove and return one or multiple random members from a set                               |
+| `SCARD`       | Get the number of members in a set                                                        |
+| `SMEMBERS`    | Get all the members of a set                                                              |
+| `SISMEMBER`   | Test if a member exists in a set                                                          |
+| `SRANDMEMBER` | Get one or more random members from a set                                                 |
+| `SUNION`      | Get all unique members from all specified sets                                            |
+| `SUNIONSTORE` | Get all unique members from all specified sets and store in a new set                     |
+| `SINTER`      | Get members that exist in all specified sets                                              |
+| `SINTERSTORE` | Get members that exist in all specified sets and store in a new set                       |
+| `SDIFF`       | Get members from the first set that are not in the subsequent sets                        |
+| `SDIFFSTORE`  | Get members from the first set that are not in the subsequent sets and store in a new set |
+
+---
