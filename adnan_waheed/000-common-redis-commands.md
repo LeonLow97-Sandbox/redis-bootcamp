@@ -179,3 +179,22 @@ Sorted sets are an advanced data structure in Redis that combine the features of
 | ZREVRANGEBYLEX   | Return a range of members by lexicographical range, ordered from higher to lower strings | O(log(N)+M)     |
 | ZINTERSTORE      | Get keys that exist in all sets only and store the resulting sorted set in a new key     | O(N+M)          |
 | ZUNIONSTORE      | Add multiple sorted sets and store the resulting sorted set in a new key                 | O(N+M)          |
+
+### HyperLogLog
+
+Use cases for HyperLogLog (HLL):
+
+- Counting unique visitors to a website or platform.
+- Generating unique identifiers for items in a book or inventory.
+- Maintaining a record of the best-performing stocks.
+- Generating unique names for products, services, or categories.
+- Tracking unique student names in a class or dataset.
+- Situations prioritizing dataset counts over individual elements.
+
+HyperLogLog is efficient for counting unique data with minimal memory usage. HLL offers high performance at low computational cost. Ideal for scenarios where large datasets need to be analyzed for unique elements.
+
+| Command | Description                       | Time Complexity                                                           |
+| ------- | --------------------------------- | ------------------------------------------------------------------------- |
+| PFADD   | Append one or more elements       | O(1) per element                                                          |
+| PFCOUNT | Count number of elements          | O(1)                                                                      |
+| PFMERGE | Merge elements from multiple keys | O(N) where N is the total number of elements across all keys being merged |
