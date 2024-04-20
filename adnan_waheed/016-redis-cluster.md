@@ -270,3 +270,85 @@ OK
 OK
 127.0.0.1:7001>
 ```
+
+## Cluster Commands - Check Nodes, Slaves, Slots
+
+- `redis-cli --cluster check 127.0.0.1:7001`: used to check the health and configuration of a Redis Cluster node
+- `redis-cli -p 7001 cluster nodes`: used to list information about all nodes in a Redis Cluster running on a specific port (7001 in this case), including their roles and hash slot assignments.
+
+## High Availability in Redis Cluster
+
+- If one of our Master nodes has issues, then there will be a failover, a Slave node will be promoted to a Master node.
+
+```
+## shutdown one of our Master Slaves running on port 7001
+127.0.0.1:7001> info replication
+# Replication
+role:master
+connected_slaves:1
+slave0:ip=127.0.0.1,port=7004,state=online,offset=10384,lag=1
+master_failover_state:no-failover
+master_replid:313c9bae9c371900421653c15fe31541ce16f999
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:10384
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1
+repl_backlog_histlen:10384
+
+127.0.0.1:7001> shutdown
+
+## 7001 is gone
+(base) ➜  cluster git:(main) ✗ ps -ef | grep redis
+  501 72168 86024   0  8:57PM ttys017    0:00.00 grep --color=auto --exclude-dir=.bzr --exclude-dir=CVS --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn --exclude-dir=.idea --exclude-dir=.tox redis
+  501 86346 86024   0  6:02PM ttys017    0:11.82 redis-server *:7002 [cluster]
+  501 87133 86024   0  6:03PM ttys017    0:12.27 redis-server *:7003 [cluster]
+  501 87291 86024   0  6:03PM ttys017    0:11.64 redis-server *:7004 [cluster]
+  501 87471 86024   0  6:03PM ttys017    0:11.84 redis-server *:7005 [cluster]
+  501 87625 86024   0  6:04PM ttys017    0:11.62 redis-server *:7006 [cluster]
+
+## 7004 which was a slave was promoted to a Master node
+(base) ➜  cluster git:(main) ✗ redis-cli -c -p 7004
+
+127.0.0.1:7004> info replication
+# Replication
+role:master
+connected_slaves:0
+master_failover_state:no-failover
+master_replid:523e9f6d59226a3384eb9a38a65204642634c3ab
+master_replid2:313c9bae9c371900421653c15fe31541ce16f999
+master_repl_offset:10384
+second_repl_offset:10385
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1
+repl_backlog_histlen:10384
+```
+
+- Thus, if a Master node goes down, a slave node will be promoted to become a master node. This is a failover scenario which means that Redis Cluster provides high availability.
+
+## Adding a Node to a Redis Cluster
+
+- Adding back our node with port 7001 to the Redis Cluster. Although it was introduced as a Master Node, our Redis Cluster automatically changes it to a Slave Node and connect it with Master Node 7004
+  - `redis-server n1_redis.conf &`
+  - Automatically, Redis Cluster has assigned the Master Node (port 7004) to connect to Slave Node (port 7001)
+  ```
+  73693:S 20 Apr 2024 20:59:55.046 * Connecting to MASTER 127.0.0.1:7004
+  73693:S 20 Apr 2024 20:59:55.046 * MASTER <-> REPLICA sync started
+  ```
+
+```
+127.0.0.1:7001> info replication
+# Replication
+role:slave
+master_host:127.0.0.1
+master_port:7004
+
+127.0.0.1:7004> info replication
+# Replication
+role:master
+connected_slaves:1
+```
+
+
