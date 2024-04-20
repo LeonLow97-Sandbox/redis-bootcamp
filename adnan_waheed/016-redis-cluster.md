@@ -1,6 +1,6 @@
 # Redis Cluster (ChatGPT)
 
-A Redis Cluster is a distributed implementation of Redis that allows you to automatically partition your data across multiple Redis nodes (instances) for scalability, performance and high availability.
+> A Redis Cluster is a distributed implementation of Redis that allows you to automatically partition your data across multiple Redis nodes (instances) for scalability, performance and high availability.
 
 1. **Distributed Architecture**: Redis Cluster uses a distributed architecture where data is sharded (partitioned) across multiple Redis nodes. This allows you to horizontally scale Redis beyond the capacity of a single node.
 2. **Data Sharding**: Redis Cluster automatically partitions data into slots (ranges of hash space) across multiple nodes. Each node in the cluster is responsible for handling a subset of these slots.
@@ -424,5 +424,50 @@ connected_slaves:1
 "f5e5114ce8f0395f3e6e099ceea13ffc1302785a"
 127.0.0.1:7002> cluster replicas f5e5114ce8f0395f3e6e099ceea13ffc1302785a
 1) "30fd0eca4f5d2117b40ad28309826c5552aefdff 127.0.0.1:7005@17005 slave f5e5114ce8f0395f3e6e099ceea13ffc1302785a 0 1713619164056 2 connected"
+```
+
+## Find a hash slot number of keys and keys in slots
+
+- `cluster slots`
+- `cluster keyslot [key]` returns the hash slot where the key-value is stored.
+
+```
+127.0.0.1:7004> cluster keyslot k2
+(integer) 449
+127.0.0.1:7004> cluster keyslot name
+(integer) 5798
+```
+
+- Getting the hash slot for a key that does not exist in Redis Cluster
+
+```
+## key `name1` does not exist in Redis Cluster
+127.0.0.1:7004> cluster keyslot name1
+(integer) 12933
+
+127.0.0.1:7004> set name1 Darrel
+-> Redirected to slot [12933] located at 127.0.0.1:7003
+OK
+
+## 12933 means it will be set to Node with port 7003
+127.0.0.1:7003> keys *
+1) "name1"
+2) "foo"
+3) "k1"
+127.0.0.1:7003> get name1
+"Darrel"
+```
+
+- `getkeysinslot` returns the key when provided the key hash
+
+```
+127.0.0.1:7003> keys *
+1) "name1"
+2) "foo"
+3) "k1"
+127.0.0.1:7003> cluster keyslot name1
+(integer) 12933
+127.0.0.1:7003> cluster getkeysinslot 12933 1
+1) "name1"
 ```
 
