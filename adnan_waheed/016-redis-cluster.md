@@ -351,4 +351,27 @@ role:master
 connected_slaves:1
 ```
 
+## What happens when a slave is shutdown?
 
+- Nothing will happen in the Redis Cluster, Master slaves and Redis Cluster will still stay the same.
+- Shutdown Slave Node (port 7006)
+
+```
+(base) ➜  cluster git:(main) ✗ redis-cli -c -p 7006
+127.0.0.1:7006> role
+1) "slave"
+2) "127.0.0.1"
+3) (integer) 7003
+4) "connected"
+5) (integer) 11228
+127.0.0.1:7006> shutdown
+
+## Slave Node (port 7006) is indeed shutdown
+(base) ➜  cluster git:(main) ✗ ps -ef | grep redis
+  501 73693 86024   0  8:59PM ttys017    0:00.64 redis-server *:7001 [cluster]
+  501 77909 86024   0  9:06PM ttys017    0:00.00 grep --color=auto --exclude-dir=.bzr --exclude-dir=CVS --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn --exclude-dir=.idea --exclude-dir=.tox redis
+  501 86346 86024   0  6:02PM ttys017    0:12.86 redis-server *:7002 [cluster]
+  501 87133 86024   0  6:03PM ttys017    0:13.31 redis-server *:7003 [cluster]
+  501 87291 86024   0  6:03PM ttys017    0:12.70 redis-server *:7004 [cluster]
+  501 87471 86024   0  6:03PM ttys017    0:12.89 redis-server *:7005 [cluster]
+```
