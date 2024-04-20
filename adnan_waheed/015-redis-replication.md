@@ -267,3 +267,30 @@ OK
 db0:keys=3,expires=0,avg_ttl=0
 db1:keys=1,expires=0,avg_ttl=0
 ```
+
+## `ROLE` command
+
+- Output of `ROLE` command depends on whether redis server is running master, slave or sentinel.
+
+- Master
+
+```
+127.0.0.1:6379> role
+1) "master"
+2) (integer) 12366          ## current master `master_repl_offset`
+3) 1) 1) "::1"              ## 1 slave connected
+      2) "6380"             ## port 6380
+      3) "12366"            ## last acknowledged replication offset
+```
+
+- Slave
+
+```
+127.0.0.1:6380> role
+1) "slave"
+2) "localhost"              ## IP address
+3) (integer) 6379           ## port number of the master
+4) "connected"              ## state of replication, "connected" to master
+5) (integer) 12366          ## master replication offset
+```
+
