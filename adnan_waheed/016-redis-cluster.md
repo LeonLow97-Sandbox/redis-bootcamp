@@ -471,3 +471,28 @@ OK
 1) "name1"
 ```
 
+## Shutdown a Cluster
+
+> Shutdown Slave Node, followed by Master Node.
+
+- Find the Slaves Nodes with `cluster nodes` command
+
+```
+127.0.0.1:7001> cluster nodes
+30fd0eca4f5d2117b40ad28309826c5552aefdff 127.0.0.1:7005@17005 slave f5e5114ce8f0395f3e6e099ceea13ffc1302785a 0 1713619710517 2 connected
+e4a6c6746bb0a6c915c92c9929d23dab2d32e795 127.0.0.1:7001@17001 myself,slave 2f5d26afeac4300f0986930c54ce261b8a572acf 0 1713619709000 7 connected
+f5e5114ce8f0395f3e6e099ceea13ffc1302785a 127.0.0.1:7002@17002 master - 0 1713619709000 2 connected 5461-10922
+dc0757f4f08f9e5d40c6288a81979b1939b2275d 127.0.0.1:7003@17003 master - 0 1713619709000 3 connected 10923-16383
+6c57151ea9e9054f0a2f0c400aa8046f8fef0c2e 127.0.0.1:7006@17006 slave,fail dc0757f4f08f9e5d40c6288a81979b1939b2275d 1713618337097 1713618334558 3 disconnected
+2f5d26afeac4300f0986930c54ce261b8a572acf 127.0.0.1:7004@17004 master - 0 1713619709504 7 connected 0-5460
+```
+
+- Nodes with ports 7005, 7001 and 7006 are Slave Nodes.
+    - `redis-cli -p 7001 shutdown`
+
+```
+(base) ➜  cluster git:(main) ✗ ps -ef | grep redis
+  501 87291 86024   0  6:03PM ttys017    0:17.37 redis-server *:7004 [cluster]
+  501 87471 86024   0  6:03PM ttys017    0:17.46 redis-server *:7005 [cluster]
+  501 93904 86024   0  9:30PM ttys017    0:00.00 grep --color=auto --exclude-dir=.bzr --exclude-dir=CVS --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn --exclude-dir=.idea --exclude-dir=.tox redis
+```
