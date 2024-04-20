@@ -274,7 +274,7 @@ OK
 ## Cluster Commands - Check Nodes, Slaves, Slots
 
 - `redis-cli --cluster check 127.0.0.1:7001`: used to check the health and configuration of a Redis Cluster node
-- `redis-cli -p 7001 cluster nodes`: used to list information about all nodes in a Redis Cluster running on a specific port (7001 in this case), including their roles and hash slot assignments.
+- `redis-cli -p 7001 cluster nodes`: used to list information about all nodes in a Redis Cluster running on a specific port (7001 in this case), including their roles and hash slot assignments. It also returns the **Node ID**.
 
 ## High Availability in Redis Cluster
 
@@ -375,3 +375,54 @@ connected_slaves:1
   501 87291 86024   0  6:03PM ttys017    0:12.70 redis-server *:7004 [cluster]
   501 87471 86024   0  6:03PM ttys017    0:12.89 redis-server *:7005 [cluster]
 ```
+
+## Using CLUSTER NODES, CLUSTER SLOTS commands
+
+- `cluster slots` also returns the node ID in each hash slot.
+
+```
+127.0.0.1:7002> cluster slots
+1) 1) (integer) 0
+   2) (integer) 5460
+   3) 1) "127.0.0.1"
+      2) (integer) 7004
+      3) "2f5d26afeac4300f0986930c54ce261b8a572acf"
+      4) (empty array)
+   4) 1) "127.0.0.1"
+      2) (integer) 7001
+      3) "e4a6c6746bb0a6c915c92c9929d23dab2d32e795"
+      4) (empty array)
+2) 1) (integer) 5461
+   2) (integer) 10922
+   3) 1) "127.0.0.1"
+      2) (integer) 7002
+      3) "f5e5114ce8f0395f3e6e099ceea13ffc1302785a"
+      4) (empty array)
+   4) 1) "127.0.0.1"
+      2) (integer) 7005
+      3) "30fd0eca4f5d2117b40ad28309826c5552aefdff"
+      4) (empty array)
+3) 1) (integer) 10923
+   2) (integer) 16383
+   3) 1) "127.0.0.1"
+      2) (integer) 7003
+      3) "dc0757f4f08f9e5d40c6288a81979b1939b2275d"
+      4) (empty array)
+```
+
+- `cluster nodes`
+
+## Using CLUSTER INFO, MYID and REPLICAS commands
+
+- `cluster help` to get all the commands
+- `cluster info` give a short summary of the Redis Cluster.
+- `cluster myid` getting the Node ID of the node
+- `cluster replicas [node_id]`
+
+```
+127.0.0.1:7002> cluster myid
+"f5e5114ce8f0395f3e6e099ceea13ffc1302785a"
+127.0.0.1:7002> cluster replicas f5e5114ce8f0395f3e6e099ceea13ffc1302785a
+1) "30fd0eca4f5d2117b40ad28309826c5552aefdff 127.0.0.1:7005@17005 slave f5e5114ce8f0395f3e6e099ceea13ffc1302785a 0 1713619164056 2 connected"
+```
+
