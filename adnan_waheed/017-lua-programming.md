@@ -18,3 +18,4 @@
 
 - `brew install lua`
 - Lua file extension: `.lua`
+- To run lua, `lua [filename]`
