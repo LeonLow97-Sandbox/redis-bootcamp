@@ -358,4 +358,25 @@ redis-cli -h localhost -p 6379 < ./import_users.redis\n
 
 ## Creating Indexes on Movies database
 
-- Create a 
+- Create a idx:movie index
+- Create a idx:actor index
+- Create a idx:theater index
+- Create a idx:user index
+- Pick the correct indexes because creating multiple indexes will take up disk space and memory space.
+
+```
+127.0.0.1:6379> FT.CREATE idx:movie ON hash PREFIX 1 "movie:" SCHEMA movie_name TEXT SORTABLE release_year NUMERIC SORTABLE category TAG SORTABLE rating NUMERIC SORTABLE plot TEXT
+
+127.0.0.1:6379> FT.CREATE idx:actor ON hash PREFIX 1 "actor:" SCHEMA first_name TEXT SORTABLE last_name TEXT SORTABLE date_of_birth NUMERIC SORTABLE
+
+127.0.0.1:6379> FT.CREATE idx:theater ON hash PREFIX 1 "theater:" SCHEMA name TEXT SORTABLE location GEO
+
+127.0.0.1:6379> FT.CREATE idx:user ON hash PREFIX 1 "user:" SCHEMA gender TAG country TAG SORTABLE last_login NUMERIC SORTABLE location GEO
+
+127.0.0.1:6379> FT._LIST
+1) "idx:actor"
+2) "idx:movie"
+3) "idx:user"
+4) "idx:theater"
+```
+
