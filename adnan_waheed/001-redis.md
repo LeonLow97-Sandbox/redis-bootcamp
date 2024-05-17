@@ -23,3 +23,14 @@
     - `info cpu`
     - `info cluster` combine multiple redis server together to build microservices
 
+## Redis Modules
+
+- Redis modules make it possible to extend Redis functionality using external modules, rapidly implementing new Redis commands with features similar to what can be done inside the core itself.
+- Redis module are dynamic libraries that can be loaded into Redis at startup
+- Redis modules add capabilities to core-Redis and help you use Redis to build powerful applications such as:
+    - search
+    - real-time inventory monitoring
+    - analytics
+    - gaming, and more
+- Redis 5.0 marks the general availability of the Redis loadable module system. With Redis modules, the developer can now extend Redis functionality in a way suitable to your application's architectural requirements. You can now introduce custom API (Redis commands) that are equally performant to core Redis commands while keeping the simplicity and elegance of using Redis commands intact.
+- Exhaustive list of Redis modules at: `https://redis.io/modules`

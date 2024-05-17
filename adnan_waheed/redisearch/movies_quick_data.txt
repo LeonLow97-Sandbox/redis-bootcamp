@@ -1,0 +1,11 @@
+HSET movie:1 movie_name "The Matrix" plot "Humans are unknowingly trapped within a simulated reality called the Matrix." category "Sci-Fi" release_year "1999" rating "8.7" imdb_id "tt0133093"
+
+HSET movie:2 movie_name "The Shawshank Redemption" plot "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency." category "Drama" release_year "1994" rating "9.2" imdb_id "tt0111161"
+
+HSET movie:3 movie_name "The Dark Knight" plot "Batman battles the Joker, a criminal mastermind who seeks to destroy Gotham City." category "Action" release_year "2008" rating "9.0" imdb_id "tt0468569"
+
+HSET movie:4 movie_name "Inception" plot "A thief is given the task of planting an idea in someone's mind instead of stealing it." category "Sci-Fi" release_year "2010" rating "8.8" imdb_id "tt1375666"
+
+HSET movie:5 movie_name "The Matrix Reloaded" plot "Neo and the human city of Zion are threatened by the rogue program Smith." category "Sci-Fi" release_year "2003" rating "7.5" imdb_id "tt0234215"
+
+HSET movie:6 movie_name "The Last Samurai" release_year 2000 rating 10 votes 2999999

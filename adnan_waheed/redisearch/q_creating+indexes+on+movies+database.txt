@@ -1,0 +1,14 @@
+ft._list
+hgetall movie:1
+ft.create idx:movie ON hash PREFIX 1 "movie:" SCHEMA movie_name TEXT SORTABLE release_year NUMERIC SORTABLE category TAG SORTABLE rating NUMERIC SORTABLE plot TEXT
+ft.info idx:movie
+hgetall actor:1
+ft.create idx:actor ON hash PREFIX 1 "actor:" SCHEMA first_name TEXT SORTABLE last_name TEXT SORTABLE date_of_birth NUMERIC SORTABLE
+ft.info idx:actor
+hgetall theater:1
+ft.create idx:theater ON hash PREFIX 1 "theater:" SCHEMA name TEXT SORTABLE location GEO
+ft.info idx:theater
+hgetall user:1
+ft.create idx:user ON hash PREFIX 1 "user:" SCHEMA gender TAG country TAG SORTABLE last_login NUMERIC SORTABLE location GEO
+ft.info idx:user
+
