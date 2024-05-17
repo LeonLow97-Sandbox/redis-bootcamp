@@ -380,3 +380,183 @@ redis-cli -h localhost -p 6379 < ./import_users.redis\n
 4) "idx:theater"
 ```
 
+## Using `@fieldname` with and without contains
+
+- Simple and complex conditions
+- Sorting
+- Pagination of data
+- Counting Operation
+
+```
+## get all movies with word "heat" or related to "heat" (in plot)
+127.0.0.1:6379> FT.SEARCH idx:movie "heat" RETURN 3 movie_name release_year plot
+1) (integer) 4
+2) "movie:818"
+3) 1) "movie_name"
+   2) "California Heat"
+   3) "release_year"
+   4) "1995"
+   5) "plot"
+   6) "A lifeguard bets he can be true to just one woman."
+4) "movie:1141"
+5) 1) "movie_name"
+   2) "Heat"
+   3) "release_year"
+   4) "1995"
+   5) "plot"
+   6) "A group of professional bank robbers start to feel the heat from police when they unknowingly leave a clue at their latest heist."
+6) "movie:736"
+7) 1) "movie_name"
+   2) "Chicago Justice"
+   3) "release_year"
+   4) "2017"
+   5) "plot"
+   6) "The State's Attorney's dedicated team of prosecutors and investigators navigates heated city politics and controversy head-on,while fearlessly pursuing justice."
+8) "movie:1109"
+9) 1) "movie_name"
+   2) "Love & Hip Hop: Miami"
+   3) "release_year"
+   4) "2018"
+   5) "plot"
+   6) "'Love and Hip Hop Miami' turns up the heat and doesn't hold back in making the 305 the place to be. Multi-platinum selling hip-hop legend Trick Daddy is back in the studio collaborating ..."
+```
+
+```
+## get all movies with title containing the word "heat" or related to "heat"
+127.0.0.1:6379> FT.SEARCH idx:movie "@movie_name:heat" RETURN 2 movie_name release_year
+1) (integer) 2
+2) "movie:818"
+3) 1) "movie_name"
+   2) "California Heat"
+   3) "release_year"
+   4) "1995"
+4) "movie:1141"
+5) 1) "movie_name"
+   2) "Heat"
+   3) "release_year"
+   4) "1995"
+```
+
+```
+## get all movies with title containing the word "heat" and does NOT contain "california"
+127.0.0.1:6379> FT.SEARCH idx:movie "@movie_name:(heat -california)" RETURN 3 movie_name release_year plot
+1) (integer) 1
+2) "movie:1141"
+3) 1) "movie_name"
+   2) "Heat"
+   3) "release_year"
+   4) "1995"
+   5) "plot"
+   6) "A group of professional bank robbers start to feel the heat from police when they unknowingly leave a clue at their latest heist."
+```
+
+## Search with `OR` criteria
+
+- E.g., Find all the 'Drama' or 'Comedy' movies that have 'heat' in the movie_name.
+  - `@fieldname:{Drama|Comedy}`
+
+```
+## get movie names containing the word 'heat'
+127.0.0.1:6379> FT.SEARCH idx:movie "@movie_name:(heat)" RETURN 2 movie_name release_year
+1) (integer) 2
+2) "movie:818"
+3) 1) "movie_name"
+   2) "California Heat"
+   3) "release_year"
+   4) "1995"
+4) "movie:1141"
+5) 1) "movie_name"
+   2) "Heat"
+   3) "release_year"
+   4) "1995"
+
+## get all the 'Drama' or 'Comedy' movies that have 'heat' in the movie_name
+127.0.0.1:6379> FT.SEARCH idx:movie "@movie_name:(heat) @category:{Drama|Comedy}" RETURN 2 movie_name release_year
+1) (integer) 2
+2) "movie:1141"
+3) 1) "movie_name"
+   2) "Heat"
+   3) "release_year"
+   4) "1995"
+4) "movie:818"
+5) 1) "movie_name"
+   2) "California Heat"
+   3) "release_year"
+   4) "1995"
+
+## get all the 'Drama' or 'Comedy' movies OR movie names with 'heat'
+127.0.0.1:6379> FT.SEARCH idx:movie "@movie_name:(heat) | @category:{Drama|Comedy}" RETURN 2 movie_name release_year
+```
+
+## Search condition1 AND (condition2 OR condition3)
+
+- E.g., Find all 'Mystery' OR 'Thriller' movies, released in 2014 OR 2018
+  - `@field`
+  - `[2014 2014] | [2018 2018]`
+
+```
+127.0.0.1:6379> FT.SEARCH idx:movie "@category:{Mystery|Thriller} (@release_year:[2014 2014] | @release_year:[2018 2018])" RETURN 3 movie_name release_year category
+1) (integer) 3
+2) "movie:65"
+3) 1) "movie_name"
+   2) "The Loft"
+   3) "release_year"
+   4) "2014"
+   5) "category"
+   6) "Mystery"
+4) "movie:461"
+5) 1) "movie_name"
+   2) "The Boat ()"
+   3) "release_year"
+   4) "2018"
+   5) "category"
+   6) "Mystery"
+6) "movie:989"
+7) 1) "movie_name"
+   2) "Los Angeles Overnight"
+   3) "release_year"
+   4) "2018"
+   5) "category"
+   6) "Thriller"
+```
+
+## Numeric Conditions
+
+- E.g., We want WHERE num BETWEEN 1 AND 2 like in Postgres
+  - `@num:[1 2]`: syntax for RediSearch with numeric conditions
+
+```
+127.0.0.1:6379> FT.SEARCH idx:movie "@release_year:[2000 2001]" RETURN 2 movie_name release_year
+```
+
+- E.g., WHERE num >= 10
+  - `@num:[10 +inf]`
+
+```
+## get all movies with release year that are above year 2000
+127.0.0.1:6379> FT.SEARCH idx:movie "@release_year:[2000 +inf]" RETURN 2 movie_name release_year
+```
+
+- E.g., WHERE num > 10
+  - `@num:[(10 +inf]`
+
+```
+## get all movies above year 2014 and NOT including year 2014
+127.0.0.1:6379> FT.SEARCH idx:movie "@release_year:[(2014 +inf]" RETURN 2 movie_name release_year
+```
+
+- E.g., WHERE num < 10
+  - `@num:[-inf (10]`
+
+```
+## get all movies with release year that are below year 2014 and not including 2014
+127.0.0.1:6379> FT.SEARCH idx:movie "@release_year:[-inf (2014]" RETURN 2 movie_name release_year
+```
+
+- E.g., WHERE num <= 10
+  - `@num:[-inf 10]`
+
+```
+## get all movies with release year that are below year 2014 (inclusive)
+127.0.0.1:6379> FT.SEARCH idx:movie "@release_year:[-inf 2014]" RETURN 2 movie_name release_year
+```
