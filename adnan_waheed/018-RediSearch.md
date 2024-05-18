@@ -599,3 +599,37 @@ FT.INFO idx:movie
        7) WEIGHT
        8) "1"
 ```
+
+## Limiting results using `LIMIT`
+
+- Pagination Queries
+  - `LIMIT <from> <numOfRecords>` **from** is the offset
+- E.g., Get all the 'Action' movies, sorted by release_year from the oldest to the most recent, returning the record by batch of 100 movies.
+  Then, find the next batch of 100 movies.
+
+```
+## displaying the first 10 records (by default)
+127.0.0.1:6379> FT.SEARCH idx:actor "*"
+
+## displaying the first 5 records
+127.0.0.1:6379> FT.SEARCH idx:actor "*" LIMIT 0 5
+
+## displaying the first record
+127.0.0.1:6379> FT.SEARCH idx:actor "*" LIMIT 0 1
+
+## skipping one record
+127.0.0.1:6379> FT.SEARCH idx:actor "*" LIMIT 1 1
+```
+
+```
+## displaying the first 100 records
+127.0.0.1:6379> FT.SEARCH idx:movie "@category:{Action}" LIMIT 0 100 SORTBY release_year DESC
+127.0.0.1:6379> FT.SEARCH idx:movie "@category:{Action}" SORTBY release_year DESC LIMIT 0 100
+
+## next batch of 100 records
+127.0.0.1:6379> FT.SEARCH idx:movie "@category:{Action}" LIMIT 100 100 SORTBY release_year DESC
+
+## this time it returned an integer because there are only 186 records in total
+127.0.0.1:6379> FT.SEARCH idx:movie "@category:{Action}" LIMIT 200 100 SORTBY release_year DESC
+1) (integer) 186
+```
