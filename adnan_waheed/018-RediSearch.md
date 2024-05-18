@@ -560,3 +560,42 @@ redis-cli -h localhost -p 6379 < ./import_users.redis\n
 ## get all movies with release year that are below year 2014 (inclusive)
 127.0.0.1:6379> FT.SEARCH idx:movie "@release_year:[-inf 2014]" RETURN 2 movie_name release_year
 ```
+
+## Sort data with `SORTBY`
+
+- E.g., Get all the "Action" movies, sorted by release_year from most recent to the oldest.
+
+```
+## sort in ascending order
+FT.SEARCH idx:movie "@category:{Action}" SORTBY release_year RETURN 2 movie_name release_year
+
+## sort in descending order (Add "DESC")
+FT.SEARCH idx:movie "@category:{Action}" SORTBY release_year DESC RETURN 2 movie_name release_year
+```
+
+```
+## sort in alphabetical order did not work because "plot" field does not have SORTABLE
+FT.SEARCH idx:movie "@category:{Action}" SORTBY plot RETURN 3 movie_name release_year plot
+```
+
+- Checking what elements are SORTABLE
+
+```
+## we can clearly see that "plot" element is not SORTABLE but "release_year" is SORTABLE
+FT.INFO idx:movie
+    2) 1) identifier
+       2) release_year
+       3) attribute
+       4) release_year
+       5) type
+       6) NUMERIC
+       7) SORTABLE
+    5) 1) identifier
+       2) plot
+       3) attribute
+       4) plot
+       5) type
+       6) TEXT
+       7) WEIGHT
+       8) "1"
+```
