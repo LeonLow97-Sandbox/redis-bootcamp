@@ -92,7 +92,7 @@ OK
 integer
 ```
 
-## JSON `STRLEN` and `STRAPPEND`
+## RedisJSON `STRLEN` and `STRAPPEND`
 
 - `JSON.STRLEN key`: get the string length of a JSON key
 - `JSON.STRAPPEND key path 'value'`: append string to a json value
@@ -121,4 +121,39 @@ OK
 9
 127.0.0.1:6379> json.get name
 "Leon Low"
+```
+
+## RedisJSON `OBJLEN` and `OBJKEYS`
+
+- `JSON.OBJLEN key`: object length
+- `JSON.OBJKEYS key`: object keys
+
+```
+127.0.0.1:6379> json.get user:101
+{"name":"Leon Low","age":27}
+127.0.0.1:6379> json.objlen user:101
+2
+
+127.0.0.1:6379> json.objkeys user:101
+name
+age
+```
+
+## RedisJSON `NUMINCRBY` and `NUMMULTBY`
+
+- `JSON.NUMINCRBY key path value`: increment by
+- `JSON.NUMMULTBY key path value`: multiply by
+
+```
+127.0.0.1:6379> json.get user:101
+{"name":"Leon Low","age":27}
+127.0.0.1:6379> json.numincrby user:101 .age 50
+77
+127.0.0.1:6379> json.get user:101
+{"name":"Leon Low","age":77}
+
+127.0.0.1:6379> json.nummultby user:101 .age 2
+154
+127.0.0.1:6379> json.get user:101
+{"name":"Leon Low","age":154}
 ```
