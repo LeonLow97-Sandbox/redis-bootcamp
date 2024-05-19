@@ -350,10 +350,10 @@ OK
 (base) ➜  redisearch git:(main) ✗ pwd
 /Users/leonlow/Desktop/udemy/redis-bootcamp/adnan_waheed/redisearch
 
-redis-cli -h localhost -p 6379 < ./import_actors.redis\n
-redis-cli -h localhost -p 6379 < ./import_movies.redis\n
-redis-cli -h localhost -p 6379 < ./import_theaters.redis\n
-redis-cli -h localhost -p 6379 < ./import_users.redis\n
+redis-cli -h localhost -p 6379 < ./import_actors.redis
+redis-cli -h localhost -p 6379 < ./import_movies.redis
+redis-cli -h localhost -p 6379 < ./import_theaters.redis
+redis-cli -h localhost -p 6379 < ./import_users.redis
 ```
 
 ## Creating Indexes on Movies database
@@ -1062,4 +1062,3 @@ SCHEMA
     5) "category"
     6) "Drama"
 ```
-
