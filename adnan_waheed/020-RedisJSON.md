@@ -156,4 +156,102 @@ age
 154
 127.0.0.1:6379> json.get user:101
 {"name":"Leon Low","age":154}
+
+## subtracting
+127.0.0.1:6379> json.numincrby user:101 .age -100
+54
+127.0.0.1:6379> json.get user:101
+{"name":"Leon Low","age":54}
 ```
+
+## Delete a JSON object
+
+- `JSON.DEL key path`: delete a JSON object
+
+```
+127.0.0.1:6379> json.set k1 . '"1"'
+OK
+127.0.0.1:6379> json.get k1
+"1"
+127.0.0.1:6379> json.del k1
+1
+127.0.0.1:6379> keys k1
+
+127.0.0.1:6379> json.get k1
+
+```
+
+```
+127.0.0.1:6379> json.set user:2 . '[true, {"name":"John"},null]'
+OK
+127.0.0.1:6379> json.get user:2
+[true,{"name":"John"},null]
+127.0.0.1:6379> json.type user:2
+array
+127.0.0.1:6379> json.get user:2 [1]
+{"name":"John"}
+127.0.0.1:6379> json.get user:2 [1].name
+"John"
+127.0.0.1:6379> json.get user:2 [0]
+true
+127.0.0.1:6379> json.get user:2 [2]
+null
+
+## delete individual elements in array
+127.0.0.1:6379> json.del user:2 [-1]
+1
+127.0.0.1:6379> json.get user:2
+[true,{"name":"John"}]
+
+127.0.0.1:6379> json.del user:2 [0]
+1
+127.0.0.1:6379> json.get user:2
+[{"name":"John"}]
+
+127.0.0.1:6379> json.del user:2
+1
+127.0.0.1:6379> keys user:2
+```
+
+## Memory usage for JSON object
+
+- `JSON.DEBUG MEMORY key`: the RedisJSON data type uses at least 24 bytes (on 64-bit architecture) for every value.
+
+```
+127.0.0.1:6379> json.get user:101
+{"name":"Leon Low","age":54}
+
+## get number of bytes used for JSON object
+127.0.0.1:6379> json.debug memory user:101
+151
+
+## empty string
+127.0.0.1:6379> json.set emptystr . '""'
+OK
+127.0.0.1:6379> json.debug memory emptystr
+8
+
+## empty array
+127.0.0.1:6379> json.set arr . '[]'
+OK
+127.0.0.1:6379> json.debug memory arr
+8
+
+## empty object
+127.0.0.1:6379> json.set obj . '{}'
+OK
+127.0.0.1:6379> json.debug memory obj
+8
+
+## an array with a single scary increased memory
+127.0.0.1:6379> json.set arr . '[""]'
+OK
+127.0.0.1:6379> json.debug memory arr
+64
+
+127.0.0.1:6379> json.set arr . '["","",""]'
+OK
+127.0.0.1:6379> json.debug memory arr
+80
+```
+
