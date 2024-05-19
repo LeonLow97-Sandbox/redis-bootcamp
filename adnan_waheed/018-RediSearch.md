@@ -946,3 +946,120 @@ FT.AGGREGATE idx:user
    3) "count_week_user_logins"
    4) "815"
 ```
+
+## Using `FILTER` to filter data
+
+- `FILTER <expression>`
+- FILTER expressions filter the results using predicates relating to values in the result set.
+- The FILTER expressions are evaluated post-query
+- Filter expressions follow the syntax of APPLY expressions
+- With additions of the conditions
+  - `==`
+  - `!=`
+  - `<`
+  - `<=`
+  - `>`
+- 2 or more predicates can be combined with
+  - logical AND (&&)
+  - OR (||)
+- A single predicate can be negated with a NOT prefix (!)
+
+```
+## count the number of females by country, except China, with more than 100 users, and sort in descending order
+127.0.0.1:6379> ft.aggregate idx:user "@gender:{female}" groupby 1 @country reduce count 0 as count_females filter "@country !='china' && @count_females > 100" sortby 2 @count_females desc
+1) (integer) 163
+2) 1) "country"
+   2) "indonesia"
+   3) "count_females"
+   4) "309"
+3) 1) "country"
+   2) "russia"
+   3) "count_females"
+   4) "185"
+4) 1) "country"
+   2) "philippines"
+   3) "count_females"
+   4) "153"
+5) 1) "country"
+   2) "portugal"
+   3) "count_females"
+   4) "109"
+6) 1) "country"
+   2) "brazil"
+   3) "count_females"
+   4) "108"
+```
+
+- FILTER on result sets
+
+```
+## number of login per month, for year 2020
+127.0.0.1:6379> ft.aggregate idx:user "*" apply year(@last_login) as year apply "monthofyear(@last_login) + 1" as monthofyear groupby 2 @year @monthofyear reduce count 0 as count_logins_per_month filter "@year ==2020" sortby 2 @monthofyear asc
+ 1) (integer) 13
+ 2) 1) "year"
+    2) "2020"
+    3) "monthofyear"
+    4) "1"
+    5) "count_logins_per_month"
+    6) "520"
+ 3) 1) "year"
+    2) "2020"
+    3) "monthofyear"
+    4) "2"
+    5) "count_logins_per_month"
+    6) "449"
+ 4) 1) "year"
+    2) "2020"
+    3) "monthofyear"
+    4) "3"
+    5) "count_logins_per_month"
+    6) "497"
+ 5) 1) "year"
+    2) "2020"
+    3) "monthofyear"
+    4) "4"
+    5) "count_logins_per_month"
+    6) "509"
+```
+
+## Create custom indexes via `FILTER`
+
+- Can create an index using `FILTER`
+
+```
+## create an index with all "Drama" movies released between 1990 and 2000 (2000 not included)
+FILTER "@category=='Drama' && @release_year>=1990 && @release_year<2000"
+
+FT.CREATE idx:movie:drama
+ON hash
+PREFIX 1 "movie:"
+FILTER "@category=='Drama' && @release_year>=1990 && @release_year<2000"
+SCHEMA
+  movie_name TEXT SORTABLE
+  release_year NUMERIC SORTABLE
+
+127.0.0.1:6379> ft.search idx:movie:drama "*" return 3 movie_name release_year category
+ 1) (integer) 24
+ 2) "movie:913"
+ 3) 1) "movie_name"
+    2) "Wild Texas Wind"
+    3) "release_year"
+    4) "1991"
+    5) "category"
+    6) "Drama"
+ 4) "movie:493"
+ 5) 1) "movie_name"
+    2) "Halfaouine: Boy of the Terraces"
+    3) "release_year"
+    4) "1990"
+    5) "category"
+    6) "Drama"
+ 6) "movie:919"
+ 7) 1) "movie_name"
+    2) "Love's Deadly Triangle: The Texas Cadet Murder"
+    3) "release_year"
+    4) "1997"
+    5) "category"
+    6) "Drama"
+```
+
