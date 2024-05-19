@@ -255,3 +255,88 @@ OK
 80
 ```
 
+## Design a Food Truck System via RedisJSON
+
+```
+## setup a food moving truck called "truck:1" with name "Amazing Delights"
+127.0.0.1:6379> json.set truck:1 . '{"name":"Amazing Delights"}'
+OK
+127.0.0.1:6379> json.get truck:1
+{"name":"Amazing Delights"}
+
+## lets add an indicator that our truck is open for orders
+127.0.0.1:6379> json.set truck:1 .is_open 'true'
+OK
+127.0.0.1:6379> json.get truck:1
+{"name":"Amazing Delights","is_open":true}
+
+## lets setup a wait time for 10 minutes
+127.0.0.1:6379> json.set truck:1 .wait_time 10
+OK
+127.0.0.1:6379> json.get truck:1
+{"name":"Amazing Delights","is_open":true,"wait_time":10}
+
+## lets add current location
+127.0.0.1:6379> json.set truck:1 .location '"123 Choa Chu Kang"'
+OK
+127.0.0.1:6379> json.get truck:1
+{"name":"Amazing Delights","is_open":true,"wait_time":10,"location":"123 Choa Chu Kang"}
+
+## lets add menu with item and price, using an array
+127.0.0.1:6379> json.set truck:1 .menu '[{"item":"taco","price":6},{"item":"burrito","price":8},{"item":"chicken burger","price":10}]'
+OK
+127.0.0.1:6379> json.get truck:1
+{"name":"Amazing Delights","is_open":true,"wait_time":10,"location":"123 Choa Chu Kang","menu":[{"item":"taco","price":6},{"item":"burrito","price":8},{"item":"chicken burger","price":10}]}
+
+## lets display all menu items
+127.0.0.1:6379> json.get truck:1 .menu
+[{"item":"taco","price":6},{"item":"burrito","price":8},{"item":"chicken burger","price":10}]
+
+## get the first and last item in the menu
+127.0.0.1:6379> json.get truck:1 .menu[0]
+{"item":"taco","price":6}
+127.0.0.1:6379> json.get truck:1 .menu[-1]
+{"item":"chicken burger","price":10}
+127.0.0.1:6379> json.get truck:1 .menu[2]
+{"item":"chicken burger","price":10}
+
+## total number of items in the menu, use json.arrlen instead of json.objlen
+127.0.0.1:6379> json.type truck:1 .menu
+array
+127.0.0.1:6379> json.arrlen truck:1 .menu
+3
+
+## add a new item in a menu
+127.0.0.1:6379> json.arrappend truck:1 .menu '{"item":"Lamp Chop","price":12}'
+4
+127.0.0.1:6379> json.get truck:1 .menu[-1]
+{"item":"Lamp Chop","price":12}
+
+## increase wait time to 20
+127.0.0.1:6379> json.numincrby truck:1 .wait_time 10
+20
+127.0.0.1:6379> json.get truck:1 .wait_time
+20
+
+## add special_menu to true
+127.0.0.1:6379> json.set truck:1 .special_menu true
+OK
+127.0.0.1:6379> json.get truck:1
+{"name":"Amazing Delights","is_open":true,"wait_time":20,"location":"123 Choa Chu Kang","menu":[{"item":"taco","price":6},{"item":"burrito","price":8},{"item":"chicken burger","price":10},{"item":"Lamp Chop","price":12}],"special_menu":true}
+
+## delete the special_menu
+127.0.0.1:6379> json.set truck:1 .special_menu false
+OK
+127.0.0.1:6379> json.get truck:1 .special_menu
+false
+
+## remove burrito item from the menu
+127.0.0.1:6379> json.arrpop truck:1 .menu 1
+{"item":"burrito","price":8}
+127.0.0.1:6379> json.get truck:1 .menu
+[{"item":"taco","price":6},{"item":"chicken burger","price":10},{"item":"Lamp Chop","price":12}]
+
+## add a new dish called 'sushi after 2nd menu item'
+127.0.0.1:6379> json.arrinsert truck:1 .menu 1 '{"item":"sushi","price":10}'
+4
+```
