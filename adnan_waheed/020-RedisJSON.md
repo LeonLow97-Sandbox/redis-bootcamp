@@ -91,3 +91,34 @@ OK
 127.0.0.1:6379> json.type user:101 .age
 integer
 ```
+
+## JSON `STRLEN` and `STRAPPEND`
+
+- `JSON.STRLEN key`: get the string length of a JSON key
+- `JSON.STRAPPEND key path 'value'`: append string to a json value
+
+```
+127.0.0.1:6379> json.get user:101
+{"name":"Leon Low","age":27}
+127.0.0.1:6379> json.get user:101 .name
+"Leon Low"
+127.0.0.1:6379> json.strlen user:101 .name
+8
+
+## doesnt work on values that are integer
+127.0.0.1:6379> json.strlen user:101 .age
+WRONGTYPE wrong type of path value - expected string but found integer
+```
+
+```
+127.0.0.1:6379> json.set name . '"Leon"'
+OK
+127.0.0.1:6379> json.get name
+"Leon"
+127.0.0.1:6379> json.strlen name
+4
+127.0.0.1:6379> json.strappend name '" Low"'
+9
+127.0.0.1:6379> json.get name
+"Leon Low"
+```
