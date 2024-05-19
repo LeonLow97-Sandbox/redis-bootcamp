@@ -619,6 +619,9 @@ FT.INFO idx:movie
 
 ## skipping one record
 127.0.0.1:6379> FT.SEARCH idx:actor "*" LIMIT 1 1
+
+## provides the total number of records for idx:movie
+FT.SEARCH idx:movie "*" LIMIT 0 0
 ```
 
 ```
@@ -632,4 +635,233 @@ FT.INFO idx:movie
 ## this time it returned an integer because there are only 186 records in total
 127.0.0.1:6379> FT.SEARCH idx:movie "@category:{Action}" LIMIT 200 100 SORTBY release_year DESC
 1) (integer) 186
+```
+
+## Aggregation with `FT.AGGREGATE`
+
+- Aggregation queries
+  - Grouping, Reducing, Sorting, Transforming
+- **Flow**: Filter --> Group [Reduce] --> Apply --> Sort --> Apply
+
+```
+## get all movies
+FT.SEARCH idx:movie "*" LIMIT 0 0
+
+## group all movies by each year (60 release years)
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @release_year
+ 1) (integer) 60
+ 2) 1) "release_year"
+    2) "1964"
+ 3) 1) "release_year"
+    2) "1977"
+ 4) 1) "release_year"
+    2) "1991"
+ 5) 1) "release_year"
+    2) "2004"
+ 6) 1) "release_year"
+    2) "2017"
+    ...
+
+## group all movies by category (25 categories)
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @category
+ 1) (integer) 25
+ 2) 1) "category"
+    2) "thriller"
+ 3) 1) "category"
+    2) "action"
+ 4) 1) "category"
+    2) "reality-tv"
+    ...
+
+## group all movies by each year and category (based on the query below, release_year gets grouped first then category)
+FT.AGGREGATE idx:movie "*" GROUPBY 2 @release_year @category
+
+## get total number of movies
+FT.SEARCH idx:movie "*" LIMIT 0 0
+
+## get total number of movies by each release_year
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @release_year REDUCE COUNT 0
+ 1) (integer) 60
+ 2) 1) "release_year"
+    2) "1964"
+    3) "__generated_aliascount"
+    4) "9"
+ 3) 1) "release_year"
+    2) "1977"
+    3) "__generated_aliascount"
+    4) "11"
+ 4) 1) "release_year"
+    2) "1991"
+    3) "__generated_aliascount"
+    4) "12"
+
+## set alias for __generated_aliascount
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @release_year REDUCE COUNT 0 as total_num_of_movies
+ 1) (integer) 60
+ 2) 1) "release_year"
+    2) "1964"
+    3) "total_num_of_movies"
+    4) "9"
+ 3) 1) "release_year"
+    2) "1977"
+    3) "total_num_of_movies"
+    4) "11"
+ 4) 1) "release_year"
+    2) "1991"
+    3) "total_num_of_movies"
+    4) "12"
+
+## group all movies by each release_year where movie contains "heat"
+127.0.0.1:6379> FT.AGGREGATE idx:movie "heat" GROUPBY 1 @release_year REDUCE COUNT 0 as total_num_of_movies
+1) (integer) 3
+2) 1) "release_year"
+   2) "2018"
+   3) "total_num_of_movies"
+   4) "1"
+3) 1) "release_year"
+   2) "2017"
+   3) "total_num_of_movies"
+   4) "1"
+4) 1) "release_year"
+   2) "1995"
+   3) "total_num_of_movies"
+   4) "2"
+
+## (ASCENDING) get total number of movies by each release year from most recent to oldest
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @release_year REDUCE COUNT 0 as total_num_of_movies SORTBY 1 @release_year
+ 1) (integer) 60
+ 2) 1) "release_year"
+    2) "1960"
+    3) "total_num_of_movies"
+    4) "5"
+ 3) 1) "release_year"
+    2) "1961"
+    3) "total_num_of_movies"
+    4) "7"
+ 4) 1) "release_year"
+    2) "1962"
+    3) "total_num_of_movies"
+    4) "6"
+ 5) 1) "release_year"
+    2) "1963"
+    3) "total_num_of_movies"
+    4) "7"
+
+## (DESCENDING) get total number of movies by each release year from most recent to oldest
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @release_year REDUCE COUNT 0 as total_num_of_movies SORTBY 2 @release_year DESC
+ 1) (integer) 60
+ 2) 1) "release_year"
+    2) "2019"
+    3) "total_num_of_movies"
+    4) "14"
+ 3) 1) "release_year"
+    2) "2018"
+    3) "total_num_of_movies"
+    4) "15"
+ 4) 1) "release_year"
+    2) "2017"
+    3) "total_num_of_movies"
+    4) "15"
+```
+
+## Grouping, reducing and sorting data
+
+```
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @category REDUCE COUNT 0 as total_num_of_movies SORTBY 2 @category DESC
+ 1) (integer) 25
+ 2) 1) "category"
+    2) "western"
+    3) "total_num_of_movies"
+    4) "7"
+ 3) 1) "category"
+    2) "thriller"
+    3) "total_num_of_movies"
+    4) "5"
+ 4) 1) "category"
+    2) "talk-show"
+    3) "total_num_of_movies"
+    4) "1"
+ 5) 1) "category"
+    2) "sport"
+    3) "total_num_of_movies"
+    4) "3"
+```
+
+## Grouping with multiple reduce functions `SUM`, `AVG`
+
+```
+## get total number of movies by each category, with total number of votes and average rating
+
+## getting this error because votes was not indexed, can check via `FT.INFO idx:movie` and see that attributes has no `votes`
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @category REDUCE COUNT 0 as count_of_movies REDUCE SUM 1 votes
+(error) Property `votes` not present in document or pipeline
+
+127.0.0.1:6379> FT.ALTER idx:movie SCHEMA ADD votes numeric sortable
+OK
+
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @category REDUCE COUNT 0 as count_of_movies REDUCE SUM 1 votes as total_votes reduce avg 1 rating as average_rating
+ 1) (integer) 25
+ 2) 1) "category"
+    2) "thriller"
+    3) "count_of_movies"
+    4) "5"
+    5) "total_votes"
+    6) "29457"
+    7) "average_rating"
+    8) "6"
+ 3) 1) "category"
+    2) "action"
+    3) "count_of_movies"
+    4) "186"
+    5) "total_votes"
+    6) "34844552"
+    7) "average_rating"
+    8) "6.51290322581"
+ 4) 1) "category"
+    2) "reality-tv"
+    3) "count_of_movies"
+    4) "15"
+    5) "total_votes"
+    6) "7739"
+    7) "average_rating"
+    8) "5.3"
+
+## sort by average rating, use `average_rating` instead of `rating`
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @category REDUCE COUNT 0 as count_of_movies REDUCE SUM 1 votes as total_votes reduce avg 1 rating as average_rating sortby 1 @average_rating
+ 1) (integer) 25
+ 2) 1) "category"
+    2) "game-show"
+    3) "count_of_movies"
+    4) "2"
+    5) "total_votes"
+    6) "163"
+    7) "average_rating"
+    8) "4.3"
+ 3) 1) "category"
+    2) "reality-tv"
+    3) "count_of_movies"
+    4) "15"
+    5) "total_votes"
+    6) "7739"
+    7) "average_rating"
+    8) "5.3"
+ 4) 1) "category"
+    2) "western"
+    3) "count_of_movies"
+    4) "7"
+    5) "total_votes"
+    6) "4532"
+    7) "average_rating"
+    8) "5.38571428571"
+
+## sort by average rating in descending order
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @category REDUCE COUNT 0 as count_of_movies REDUCE SUM 1 votes as total_votes reduce avg 1 rating as average_rating sortby 2 @average_rating desc
+
+## sort by average rating in descending order, followed by sorting by total_votes in descending order
+127.0.0.1:6379> FT.AGGREGATE idx:movie "*" GROUPBY 1 @category REDUCE COUNT 0 as count_of_movies REDUCE SUM 1 votes as total_votes reduce avg 1 rating as average_rating sortby 4 @average_rating desc @total_votes desc
+```
+
+```
+## get total number of female actors by each country, sorted by descending order
+
 ```
