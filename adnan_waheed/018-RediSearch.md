@@ -862,6 +862,87 @@ OK
 ```
 
 ```
-## get total number of female actors by each country, sorted by descending order
+## get total number of female users by each country, sorted by descending order
+ft.aggregate idx:user "@gender:{female}" groupby 1 @country reduce count 0 as num_of_users sortby 2 @num_of_users desc
+```
 
+## Transforming aggregated data using `APPLY` function
+
+- `APPLY {expr} AS {name}`
+- Apply 1 to 1 transformation on one or more properties/fields in an index
+- `expr` can be used to
+  - perform arithmetic operations on numeric fields, e.g., `apply "monthofyear(@last_login) + 1" as month`
+  - or functions that can be applied on fields e.g., `SQRT`, `LOG`, etc
+- `APPLY` will evaluate this expression dynamically for each record and store the results into alias `name`
+- Multiple APPLY statements can also be used.
+
+```
+## number of logins per year and per month, sort by year in descending order and by month in ascending order
+127.0.0.1:6379> ft.aggregate idx:user "*" apply year(@last_login) as year apply "monthofyear(@last_login) + 1" as month groupby 2 @year @month reduce count 0 as number_of_logins sortby 4 @year desc @month asc
+ 1) (integer) 13
+ 2) 1) "year"
+    2) "2020"
+    3) "month"
+    4) "1"
+    5) "number_of_logins"
+    6) "520"
+ 3) 1) "year"
+    2) "2020"
+    3) "month"
+    4) "2"
+    5) "number_of_logins"
+    6) "449"
+ 4) 1) "year"
+    2) "2020"
+    3) "month"
+    4) "3"
+    5) "number_of_logins"
+    6) "497"
+```
+
+```
+## View APPLY function visually
+
+FT.AGGREGATE idx:user
+  "*"
+  APPLY year(@last_login) as year
+  APPLY "monthofyear(@last_login) + 1" as month
+
+  GROUPBY 2 @year @month
+    REDUCE count 0 as count_user_logins
+  SORTBY 4 @year DESC @month ASC
+```
+
+```
+## number of logins per weekday
+127.0.0.1:6379> ft.aggregate idx:user "*" apply "dayofweek(@last_login) + 1" as day_of_week groupby 1 @day_of_week reduce count 0 as count_week_user_logins sortby 2 @day_of_week desc
+1) (integer) 7
+2) 1) "day_of_week"
+   2) "7"
+   3) "count_week_user_logins"
+   4) "906"
+3) 1) "day_of_week"
+   2) "6"
+   3) "count_week_user_logins"
+   4) "832"
+4) 1) "day_of_week"
+   2) "5"
+   3) "count_week_user_logins"
+   4) "834"
+5) 1) "day_of_week"
+   2) "4"
+   3) "count_week_user_logins"
+   4) "878"
+6) 1) "day_of_week"
+   2) "3"
+   3) "count_week_user_logins"
+   4) "868"
+7) 1) "day_of_week"
+   2) "2"
+   3) "count_week_user_logins"
+   4) "863"
+8) 1) "day_of_week"
+   2) "1"
+   3) "count_week_user_logins"
+   4) "815"
 ```
